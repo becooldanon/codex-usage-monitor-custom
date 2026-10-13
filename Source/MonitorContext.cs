@@ -169,9 +169,9 @@ internal sealed class MonitorContext : ApplicationContext
         catch (OperationCanceledException) when (_shutdown.IsCancellationRequested) { return; }
         catch (Exception ex)
         {
-            _snapshot = UsageSnapshot.Error(ex.Message);
             WriteDiagnostic(ex.ToString());
-            SetIcons();
+            // Preserve the last successful reading instead of resetting the dashboard to N/A.
+            _dashboard.ShowRefreshError(ex.Message);
         }
         finally
         {
