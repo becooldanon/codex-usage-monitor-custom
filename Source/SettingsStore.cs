@@ -4,6 +4,7 @@ namespace CodexUsageTray;
 
 internal sealed class MonitorSettings
 {
+    public string Theme { get; set; } = "Dark";
     public int RefreshMinutes { get; set; } = 5;
     public bool AutoHide { get; set; } = true;
     public int OpacityPercent { get; set; } = 95;
