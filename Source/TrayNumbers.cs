@@ -16,8 +16,8 @@ internal static class Palette
     internal static void SetTheme(string theme) => Theme = theme is "Light" or "Dark" or "Transparent" ? theme : "Dark";
     internal static bool IsLight => Theme == "Light";
     internal static bool IsTransparent => Theme == "Transparent";
-    internal static Color Background => IsTransparent ? Color.Magenta : IsLight ? Color.FromArgb(244, 247, 252) : Color.Black;
-    internal static Color Panel => IsTransparent ? Color.Magenta : IsLight ? Color.White : Color.FromArgb(18, 18, 18);
+    internal static Color Background => IsTransparent ? Color.FromArgb(254, 254, 254) : IsLight ? Color.FromArgb(244, 247, 252) : Color.Black;
+    internal static Color Panel => IsTransparent ? Color.FromArgb(254, 254, 254) : IsLight ? Color.White : Color.FromArgb(18, 18, 18);
     internal static Color Foreground => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(25, 34, 51) : Color.FromArgb(245, 245, 245);
     internal static Color Secondary => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(85, 100, 122) : Color.FromArgb(190, 190, 190);
     internal static Color Track => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(214, 222, 234) : Color.FromArgb(62, 62, 62);
