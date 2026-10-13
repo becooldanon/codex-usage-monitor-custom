@@ -27,7 +27,9 @@ internal sealed class MonitorContext : ApplicationContext
     internal MonitorContext()
     {
         _settings = _store.Load();
-        _dashboard.Opacity = Math.Clamp(_settings.OpacityPercent, 40, 100) / 100d;
+        Palette.SetTheme(_settings.Theme);
+        _dashboard.ApplyTheme();
+        ApplyWindowOpacity();
         _dashboard.SetHistoryHours(_settings.HistoryHours is 1 or 6 or 24 or 168 or 720 ? _settings.HistoryHours : 1);
         _hideTimer.Tick += (_, _) => { if (_settings.AutoHide && !_settings.FloatingVisible && _dashboard.Visible && ! _dashboard.IsInteracting && (DateTime.Now - _shownAt).TotalSeconds >= 5) _dashboard.Hide(); };
         _hideTimer.Start();
@@ -42,12 +44,31 @@ internal sealed class MonitorContext : ApplicationContext
         var autoHide = new ToolStripMenuItem("Auto-hide after 5 seconds") { CheckOnClick = true, Checked = _settings.AutoHide };
         autoHide.CheckedChanged += (_, _) => { _settings.AutoHide = autoHide.Checked; Save(); };
         menu.Items.Add(autoHide);
+        var themeMenu = new ToolStripMenuItem("Theme");
+        foreach (string theme in new[] { "Light", "Dark", "Transparent" })
+        {
+            string selectedTheme = theme;
+            var item = new ToolStripMenuItem(theme) { Checked = Palette.Theme == theme };
+            item.Click += (_, _) =>
+            {
+                _settings.Theme = selectedTheme;
+                Palette.SetTheme(selectedTheme);
+                _dashboard.ApplyTheme();
+                ApplyWindowOpacity();
+                foreach (ToolStripMenuItem other in themeMenu.DropDownItems.OfType<ToolStripMenuItem>())
+                    other.Checked = ReferenceEquals(other, item);
+                SetIcons();
+                Save();
+            };
+            themeMenu.DropDownItems.Add(item);
+        }
+        menu.Items.Add(themeMenu);
         var opacityMenu = new ToolStripMenuItem("Window opacity");
         foreach (int percent in new[] { 100, 95, 85, 75, 60 })
         {
             int selected = percent;
             var item = new ToolStripMenuItem($"{percent}%") { Checked = _settings.OpacityPercent == percent };
-            item.Click += (_, _) => { _settings.OpacityPercent = selected; _dashboard.Opacity = selected / 100d; foreach (ToolStripMenuItem other in opacityMenu.DropDownItems.OfType<ToolStripMenuItem>()) other.Checked = ReferenceEquals(other, item); Save(); };
+            item.Click += (_, _) => { _settings.OpacityPercent = selected; ApplyWindowOpacity(); foreach (ToolStripMenuItem other in opacityMenu.DropDownItems.OfType<ToolStripMenuItem>()) other.Checked = ReferenceEquals(other, item); Save(); };
             opacityMenu.DropDownItems.Add(item);
         }
         menu.Items.Add(opacityMenu);
@@ -107,6 +128,12 @@ internal sealed class MonitorContext : ApplicationContext
         if (_settings.FloatingVisible) ShowDashboard();
         _ = RefreshAsync();
     }
+    // Transparent uses the dark palette with a lower window opacity.
+    // This is whole-window translucency, not an acrylic blur effect.
+    private void ApplyWindowOpacity() => _dashboard.Opacity =
+        Palette.Theme == "Transparent" ? Math.Min(_settings.OpacityPercent, 75) / 100d
+        : Math.Clamp(_settings.OpacityPercent, 40, 100) / 100d;
+
     private void ShowDashboard()
     {
         if (_settings.FloatingX >= 0 && _settings.FloatingY >= 0)
