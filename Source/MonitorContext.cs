@@ -128,10 +128,10 @@ internal sealed class MonitorContext : ApplicationContext
         if (_settings.FloatingVisible) ShowDashboard();
         _ = RefreshAsync();
     }
-    // Transparent uses the dark palette with a lower window opacity.
-    // This is whole-window translucency, not an acrylic blur effect.
+    // In transparent mode, color-key transparency removes the background only.
+    // Keep labels and graph lines fully opaque, and restore the normal opacity when switching themes.
     private void ApplyWindowOpacity() => _dashboard.Opacity =
-        Palette.Theme == "Transparent" ? Math.Min(_settings.OpacityPercent, 75) / 100d
+        Palette.Theme == "Transparent" ? 1d
         : Math.Clamp(_settings.OpacityPercent, 40, 100) / 100d;
 
     private void ShowDashboard()
@@ -160,18 +160,34 @@ internal sealed class MonitorContext : ApplicationContext
         try
         {
             _snapshot = await _reader.FetchAsync(_shutdown.Token);
+            if (_snapshot.ErrorMessage is not null) WriteDiagnostic(_snapshot.ErrorMessage);
             _history.Add(_snapshot);
             SetIcons();
             CheckAlerts("5h", _snapshot.FiveHour, _trayIcon);
             CheckAlerts("7d", _snapshot.Weekly, _trayIcon);
         }
         catch (OperationCanceledException) when (_shutdown.IsCancellationRequested) { return; }
-        catch (Exception ex) { _snapshot = UsageSnapshot.Error(ex.Message); SetIcons(); }
+        catch (Exception ex)
+        {
+            _snapshot = UsageSnapshot.Error(ex.Message);
+            WriteDiagnostic(ex.ToString());
+            SetIcons();
+        }
         finally
         {
             _refreshing = false;
             if (!_shutdown.IsCancellationRequested) _dashboard.Update(_snapshot, _history.Samples, false);
         }
+    }
+    private static void WriteDiagnostic(string message)
+    {
+        try
+        {
+            Directory.CreateDirectory(SettingsStore.Folder);
+            File.AppendAllText(Path.Combine(SettingsStore.Folder, "diagnostics.log"),
+                $"[{DateTimeOffset.Now:O}] {message}{Environment.NewLine}");
+        }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
     }
     private void SetIcons()
     {
