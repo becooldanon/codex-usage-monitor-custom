@@ -10,12 +10,18 @@ internal static class Palette
         <= 5 => Color.FromArgb(239, 68, 68),
         <= 10 => Color.FromArgb(249, 115, 22),
         <= 20 => Color.FromArgb(245, 158, 11),
-        _ => Color.FromArgb(52, 211, 153)
+        _ => IsLight ? Color.FromArgb(7, 132, 92) : Color.FromArgb(52, 211, 153)
     };
-    internal static readonly Color Background = Color.FromArgb(18, 24, 36);
-    internal static readonly Color Panel = Color.FromArgb(30, 40, 56);
-    internal static readonly Color Foreground = Color.FromArgb(234, 239, 247);
-    internal static readonly Color Secondary = Color.FromArgb(166, 179, 199);
+    internal static string Theme { get; private set; } = "Dark";
+    internal static void SetTheme(string theme) => Theme = theme is "Light" or "Dark" or "Transparent" ? theme : "Dark";
+    internal static bool IsLight => Theme == "Light";
+    internal static Color Background => IsLight ? Color.FromArgb(244, 247, 252) : Color.FromArgb(18, 24, 36);
+    internal static Color Panel => IsLight ? Color.White : Color.FromArgb(30, 40, 56);
+    internal static Color Foreground => IsLight ? Color.FromArgb(25, 34, 51) : Color.FromArgb(234, 239, 247);
+    internal static Color Secondary => IsLight ? Color.FromArgb(85, 100, 122) : Color.FromArgb(166, 179, 199);
+    internal static Color Track => IsLight ? Color.FromArgb(214, 222, 234) : Color.FromArgb(62, 76, 93);
+    internal static Color Guide => IsLight ? Color.FromArgb(217, 225, 236) : Color.FromArgb(58, 70, 87);
+    internal static Color Border => IsLight ? Color.FromArgb(195, 209, 224) : Color.FromArgb(69, 84, 105);
 }
 
 internal static class TrayNumbers
