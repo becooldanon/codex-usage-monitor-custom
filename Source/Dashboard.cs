@@ -11,9 +11,14 @@ internal sealed class Dashboard : Form
     internal void SetHistoryHours(int hours) => _chart.SetHistoryHours(hours);
     internal void ApplyTheme()
     {
+        // TransparencyKey removes only the background while retaining opaque text and graph lines.
         BackColor = Palette.Background;
+        TransparencyKey = Palette.IsTransparent ? Color.Magenta : Color.Empty;
         _heading.ForeColor = Palette.Foreground;
         _details.ForeColor = Palette.Secondary;
+        _five.BackColor = Palette.Background;
+        _week.BackColor = Palette.Background;
+        _chart.BackColor = Palette.Background;
         foreach (Control control in Controls)
         {
             if (control is Label label && label.Text == "×") label.ForeColor = Palette.Secondary;
@@ -87,7 +92,7 @@ internal sealed class WindowCard : Control
         TextRenderer.DrawText(g, _title, new Font("Segoe UI", 8, FontStyle.Bold), new Rectangle(12, 9, 142, 17), Palette.Secondary);
         int? number = _reading.State == LimitState.Available ? _reading.RemainingPercent : null;
         string text = number is int n ? $"{n}%" : "N/A";
-        TextRenderer.DrawText(g, text, new Font("Segoe UI", 19, FontStyle.Bold), new Rectangle(11, 26, 146, 35), Palette.For(number));
+        TextRenderer.DrawText(g, text, new Font("Segoe UI", 19, FontStyle.Bold), new Rectangle(11, 26, 146, 35), Palette.IsTransparent ? Color.Black : Palette.For(number));
         using var track = new SolidBrush(Palette.Track);
         g.FillRoundedRectangle(track, new Rectangle(12, 67, 142, 6), 3);
         if (number is int value && value > 0)
@@ -114,8 +119,8 @@ internal sealed class HistoryGraph : Control
         using var titleFont = new Font("Segoe UI", 9, FontStyle.Bold);
         TextRenderer.DrawText(g, _hours switch { 1 => "LAST HOUR", 6 => "LAST 6 HOURS", 24 => "LAST 24 HOURS", 168 => "LAST 7 DAYS", _ => "LAST 30 DAYS" }, titleFont, new Rectangle(12, 8, 190, 22), Palette.Foreground);
         using var smallFont = new Font("Segoe UI", 8);
-        TextRenderer.DrawText(g, "5h", smallFont, new Rectangle(252, 10, 28, 18), Color.FromArgb(72, 185, 240));
-        TextRenderer.DrawText(g, "7d", smallFont, new Rectangle(292, 10, 28, 18), Color.FromArgb(166, 117, 239));
+        TextRenderer.DrawText(g, "5h", smallFont, new Rectangle(252, 10, 28, 18), Palette.IsTransparent ? Color.Black : Color.FromArgb(72, 185, 240));
+        TextRenderer.DrawText(g, "7d", smallFont, new Rectangle(292, 10, 28, 18), Palette.IsTransparent ? Color.Black : Color.FromArgb(166, 117, 239));
         var area = new Rectangle(34, 36, Width - 51, Height - 55);
         using var guide = new Pen(Palette.Guide);
         foreach (int p in new[] { 0, 50, 100 })
@@ -132,7 +137,7 @@ internal sealed class HistoryGraph : Control
         void Draw(Func<HistorySample, int?> select, Color color)
         {
             var segments = new List<PointF>();
-            using var pen = new Pen(color, 2f);
+            using var pen = new Pen(Palette.IsTransparent ? Color.Black : color, 2f);
             foreach (var sample in recent)
             {
                 int? percent = select(sample);
@@ -140,9 +145,9 @@ internal sealed class HistoryGraph : Control
                 segments.Add(new PointF(area.Left + (float)((sample.Time - from).TotalSeconds / seconds * area.Width), area.Bottom - (float)(Math.Clamp(percent.Value, 0, 100) * area.Height / 100d)));
             }
             if (segments.Count > 1) g.DrawLines(pen, segments.ToArray());
-            else if (segments.Count == 1) { using var dot = new SolidBrush(color); g.FillEllipse(dot, segments[0].X - 2, segments[0].Y - 2, 4, 4); }
+            else if (segments.Count == 1) { using var dot = new SolidBrush(Palette.IsTransparent ? Color.Black : color); g.FillEllipse(dot, segments[0].X - 2, segments[0].Y - 2, 4, 4); }
         }
-        Draw(s => s.FiveHour, Color.FromArgb(72, 185, 240));
-        Draw(s => s.Weekly, Color.FromArgb(166, 117, 239));
+        Draw(s => s.FiveHour, Palette.IsTransparent ? Color.Black : Color.FromArgb(72, 185, 240));
+        Draw(s => s.Weekly, Palette.IsTransparent ? Color.Black : Color.FromArgb(166, 117, 239));
     }
 }
