@@ -2,14 +2,14 @@
 
 A Windows 11 system tray utility for monitoring **Codex 5-hour and 7-day usage limits**, built with C# / .NET 10.
 
-> **Development build (v1.1).** The v1.0.1 build was tested in Windows 11. All v1.1 changes still require full Windows compilation and testing before a binary release.
+> **v1.3 release candidate.** Usage reading has been confirmed on Windows 11 when the monitor runs in the same Windows user session as the authenticated Codex CLI. The final source changes still need a clean Windows build before publishing a binary release.
 
 ## Features
-- Three selectable themes: **Light**, **Dark**, and **Transparent** (75% maximum window opacity)
+- Two selectable themes: **Light** and **Dark**
 - One tray icon showing the **lower remaining percentage**; tooltip reports both limits
 - Adjustable polling interval (1, 2, 5, 10, 15 or 30 minutes)
 - Notifications at configurable **20%, 10% and 5%** remaining limits
-- Dark dashboard; optional always-on-top, draggable floating widget
+- Light/Dark dashboard; optional always-on-top, draggable floating widget
 - Global **Ctrl+Alt+C** show/hide shortcut (if available)
 - Auto-hide dashboard after 5 seconds when not in permanent floating mode
 - Configurable opacity (60–100%)
@@ -21,7 +21,7 @@ A Windows 11 system tray utility for monitoring **Codex 5-hour and 7-day usage l
 - Windows 11 x64
 - .NET 10 SDK and **Windows Desktop Runtime 10**
 - Authenticated `codex.cmd` CLI (ChatGPT sign-in)
-- Network access to download the upstream reader/models on first build
+- Network access to download the upstream usage models on first build
 
 ## Troubleshooting Codex CLI on Windows
 
@@ -35,7 +35,7 @@ Test-Path "$env:APPDATA\npm\node_modules\@openai\codex\bin\codex.js"
 
 If a refresh fails, the monitor retains its last successful values, which are **stale** until another successful refresh. Review `%LOCALAPPDATA%\CodexUsageMonitorCustom\diagnostics.log`.
 
-The Transparent mode uses WinForms color-key transparency; anti-aliased glyph edges may still show faint halos. A per-pixel layered window is required for fully clean transparency.
+**Important:** Run the monitor in the same Windows user session where the Codex CLI is signed in. Running from a separate administrator account will use a different user profile and may not find the authenticated CLI.
 
 ## Build and install
 
@@ -59,10 +59,10 @@ History is recorded when this application polls Codex; **earlier sessions cannot
 
 ## Attribution and licensing
 
-Inspired by [Tooblippe/codex-usage](https://github.com/Tooblippe/codex-usage), licensed under MIT. The build script downloads `CodexRateLimitReader.cs`, `UsageModels.cs` and the upstream `LICENSE` from that project's `main` branch. Preserve upstream notices when distributing modified copies or binaries. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+Inspired by [Tooblippe/codex-usage](https://github.com/Tooblippe/codex-usage), licensed under MIT. The build script downloads `UsageModels.cs` and the upstream `LICENSE` (a patched `CodexRateLimitReader.cs` is maintained in this repository) from that project's `main` branch. Preserve upstream notices when distributing modified copies or binaries. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 MIT licensed for this project's original code. Not affiliated with or endorsed by OpenAI or the upstream author.
 
 ## Validation status
 
-The v1.1 source has **not yet been compiled or smoke-tested on Windows**. Treat it as development source until validated. No prebuilt executable is published.
+The final v1.3 source cleanup has **not been independently compiled in this environment**. The monitor works on the user's Windows installation when launched from the authenticated Windows session. No prebuilt executable or GitHub Release has been published yet.
