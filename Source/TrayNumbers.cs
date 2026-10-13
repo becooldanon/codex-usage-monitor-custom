@@ -17,11 +17,11 @@ internal static class Palette
     internal static bool IsLight => Theme == "Light";
     internal static Color Background => IsLight ? Color.FromArgb(244, 247, 252) : Color.Black;
     internal static Color Panel => IsLight ? Color.White : Color.FromArgb(18, 18, 18);
-    internal static Color Foreground => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(25, 34, 51) : Color.FromArgb(245, 245, 245);
-    internal static Color Secondary => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(85, 100, 122) : Color.FromArgb(190, 190, 190);
-    internal static Color Track => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(214, 222, 234) : Color.FromArgb(62, 62, 62);
-    internal static Color Guide => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(217, 225, 236) : Color.FromArgb(52, 52, 52);
-    internal static Color Border => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(195, 209, 224) : Color.FromArgb(65, 65, 65);
+    internal static Color Foreground => IsLight ? Color.FromArgb(25, 34, 51) : Color.FromArgb(245, 245, 245);
+    internal static Color Secondary => IsLight ? Color.FromArgb(85, 100, 122) : Color.FromArgb(190, 190, 190);
+    internal static Color Track => IsLight ? Color.FromArgb(214, 222, 234) : Color.FromArgb(62, 62, 62);
+    internal static Color Guide => IsLight ? Color.FromArgb(217, 225, 236) : Color.FromArgb(52, 52, 52);
+    internal static Color Border => IsLight ? Color.FromArgb(195, 209, 224) : Color.FromArgb(65, 65, 65);
 }
 
 internal static class TrayNumbers
