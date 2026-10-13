@@ -5,6 +5,7 @@ A Windows 11 system tray utility for monitoring **Codex 5-hour and 7-day usage l
 > **Development build (v1.1).** The v1.0.1 build was tested in Windows 11. All v1.1 changes still require full Windows compilation and testing before a binary release.
 
 ## Features
+- Three selectable themes: **Light**, **Dark**, and **Transparent** (75% maximum window opacity)
 - One tray icon showing the **lower remaining percentage**; tooltip reports both limits
 - Adjustable polling interval (1, 2, 5, 10, 15 or 30 minutes)
 - Notifications at configurable **20%, 10% and 5%** remaining limits
