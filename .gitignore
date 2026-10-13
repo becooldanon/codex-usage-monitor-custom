@@ -1,0 +1,24 @@
+# .NET build outputs
+**/bin/
+**/obj/
+publish/
+.vs/
+*.user
+*.suo
+
+# Generated or imported at build time
+Source/CodexRateLimitReader.cs
+Source/UsageModels.cs
+UPSTREAM-LICENSE.txt
+
+# Local data and credentials
+history.json
+alerts.json
+settings.json
+*.pfx
+*.p12
+*.snk
+*.key
+auth.json
+.env
+.env.*
