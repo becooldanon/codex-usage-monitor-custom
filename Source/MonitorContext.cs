@@ -20,6 +20,7 @@ internal sealed class MonitorContext : ApplicationContext
     private HotkeyWindow? _hotkey;
     private UsageSnapshot _snapshot = UsageSnapshot.Initial();
     private bool _refreshing;
+    private string? _lastRefreshError;
     private readonly ToolStripMenuItem _floatMenu = new("Show floating widget") { CheckOnClick = true };
     private readonly ToolStripMenuItem _startupMenu = new("Start with Windows") { CheckOnClick = true };
     private const string StartupName = "CodexUsageMonitorCustom";
@@ -160,6 +161,7 @@ internal sealed class MonitorContext : ApplicationContext
         try
         {
             _snapshot = await _reader.FetchAsync(_shutdown.Token);
+            _lastRefreshError = null;
             if (_snapshot.ErrorMessage is not null) WriteDiagnostic(_snapshot.ErrorMessage);
             _history.Add(_snapshot);
             SetIcons();
@@ -170,13 +172,17 @@ internal sealed class MonitorContext : ApplicationContext
         catch (Exception ex)
         {
             WriteDiagnostic(ex.ToString());
+            _lastRefreshError = ex.Message;
             // Preserve the last successful reading instead of resetting the dashboard to N/A.
-            _dashboard.ShowRefreshError(ex.Message);
         }
         finally
         {
             _refreshing = false;
-            if (!_shutdown.IsCancellationRequested) _dashboard.Update(_snapshot, _history.Samples, false);
+            if (!_shutdown.IsCancellationRequested)
+            {
+                _dashboard.Update(_snapshot, _history.Samples, false);
+                if (_lastRefreshError is not null) _dashboard.ShowRefreshError(_lastRefreshError);
+            }
         }
     }
     private static void WriteDiagnostic(string message)
