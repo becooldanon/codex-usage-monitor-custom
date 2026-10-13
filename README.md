@@ -4,6 +4,9 @@
 
 A lightweight Windows 11 system tray application for tracking **OpenAI Codex rate-limit allowance** in the 5-hour and 7-day windows. Built with C# / .NET 10.
 
+<img width="373" height="341" alt="image" src="https://github.com/user-attachments/assets/281dcdcb-a7fe-4da2-891c-b17b42600019" />
+
+
 **Latest release:** [v1.3 for Windows x64](https://github.com/becooldanon/codex-usage-monitor-custom/releases/tag/v1.3). The automated Windows build produced a **49.1 MB ZIP**, and the application has been validated on Windows 11.
 
 > This displays **remaining rate-limit percentages**, not an exact count of remaining tokens. Codex may change its rate-limit response format.
