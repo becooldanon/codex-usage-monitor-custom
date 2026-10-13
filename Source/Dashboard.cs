@@ -9,6 +9,18 @@ internal sealed class Dashboard : Form
     private readonly HistoryGraph _chart = new();
     internal bool IsInteracting => ClientRectangle.Contains(PointToClient(Cursor.Position));
     internal void SetHistoryHours(int hours) => _chart.SetHistoryHours(hours);
+    internal void ApplyTheme()
+    {
+        BackColor = Palette.Background;
+        _heading.ForeColor = Palette.Foreground;
+        _details.ForeColor = Palette.Secondary;
+        foreach (Control control in Controls)
+        {
+            if (control is Label label && label.Text == "×") label.ForeColor = Palette.Secondary;
+            control.Invalidate();
+        }
+        Invalidate(true);
+    }
     private bool _dragging;
     private Point _dragOrigin;
     internal event Action? PositionChanged;
@@ -55,7 +67,7 @@ internal sealed class Dashboard : Form
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
-        using var pen = new Pen(Color.FromArgb(69, 84, 105), 1);
+        using var pen = new Pen(Palette.Border, 1);
         e.Graphics.DrawRectangle(pen, 0, 0, Width - 1, Height - 1);
     }
 }
@@ -76,7 +88,7 @@ internal sealed class WindowCard : Control
         int? number = _reading.State == LimitState.Available ? _reading.RemainingPercent : null;
         string text = number is int n ? $"{n}%" : "N/A";
         TextRenderer.DrawText(g, text, new Font("Segoe UI", 19, FontStyle.Bold), new Rectangle(11, 26, 146, 35), Palette.For(number));
-        using var track = new SolidBrush(Color.FromArgb(62, 76, 93));
+        using var track = new SolidBrush(Palette.Track);
         g.FillRoundedRectangle(track, new Rectangle(12, 67, 142, 6), 3);
         if (number is int value && value > 0)
         {
@@ -105,7 +117,7 @@ internal sealed class HistoryGraph : Control
         TextRenderer.DrawText(g, "5h", smallFont, new Rectangle(252, 10, 28, 18), Color.FromArgb(72, 185, 240));
         TextRenderer.DrawText(g, "7d", smallFont, new Rectangle(292, 10, 28, 18), Color.FromArgb(166, 117, 239));
         var area = new Rectangle(34, 36, Width - 51, Height - 55);
-        using var guide = new Pen(Color.FromArgb(58, 70, 87));
+        using var guide = new Pen(Palette.Guide);
         foreach (int p in new[] { 0, 50, 100 })
         {
             float y = area.Bottom - p * area.Height / 100f;
