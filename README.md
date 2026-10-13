@@ -23,6 +23,20 @@ A Windows 11 system tray utility for monitoring **Codex 5-hour and 7-day usage l
 - Authenticated `codex.cmd` CLI (ChatGPT sign-in)
 - Network access to download the upstream reader/models on first build
 
+## Troubleshooting Codex CLI on Windows
+
+The monitor calls the npm-installed Codex CLI using `node.exe` and its `bin/codex.js` entry point, rather than wrapping `codex` through `cmd.exe` (which may prematurely close redirected standard input). The CLI must be installed in the current user's standard npm global directory.
+
+```powershell
+codex.cmd --version
+codex.cmd login status
+Test-Path "$env:APPDATA\npm\node_modules\@openai\codex\bin\codex.js"
+```
+
+If a refresh fails, the monitor retains its last successful values, which are **stale** until another successful refresh. Review `%LOCALAPPDATA%\CodexUsageMonitorCustom\diagnostics.log`.
+
+The Transparent mode uses WinForms color-key transparency; anti-aliased glyph edges may still show faint halos. A per-pixel layered window is required for fully clean transparency.
+
 ## Build and install
 
 ```powershell
