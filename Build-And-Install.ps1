@@ -11,7 +11,7 @@ $upstream = 'https://raw.githubusercontent.com/Tooblippe/codex-usage/main'
 
 # Download only the original Codex protocol reader and data models.
 # The customized application uses separate settings, history and startup keys.
-foreach ($file in @('CodexRateLimitReader.cs', 'UsageModels.cs')) {
+foreach ($file in @('UsageModels.cs')) {
     $destination = Join-Path $projectRoot $file
     if (-not (Test-Path $destination)) {
         Write-Host "Downloading upstream dependency: $file"
