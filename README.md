@@ -1,68 +1,97 @@
 # Codex Usage Monitor Custom
 
-A Windows 11 system tray utility for monitoring **Codex 5-hour and 7-day usage limits**, built with C# / .NET 10.
+[![Release v1.3](https://img.shields.io/badge/release-v1.3-blue)](https://github.com/becooldanon/codex-usage-monitor-custom/releases/tag/v1.3)
 
-> **v1.3 release candidate.** Usage reading has been confirmed on Windows 11 when the monitor runs in the same Windows user session as the authenticated Codex CLI. The final source changes still need a clean Windows build before publishing a binary release.
+A lightweight Windows 11 system tray application for tracking **OpenAI Codex rate-limit allowance** in the 5-hour and 7-day windows. Built with C# / .NET 10.
+
+**Latest release:** [v1.3 for Windows x64](https://github.com/becooldanon/codex-usage-monitor-custom/releases/tag/v1.3). The automated Windows build produced a **49.1 MB ZIP**, and the application has been validated on Windows 11.
+
+> This displays **remaining rate-limit percentages**, not an exact count of remaining tokens. Codex may change its rate-limit response format.
 
 ## Features
-- Two selectable themes: **Light** and **Dark**
-- One tray icon showing the **lower remaining percentage**; tooltip reports both limits
-- Adjustable polling interval (1, 2, 5, 10, 15 or 30 minutes)
-- Notifications at configurable **20%, 10% and 5%** remaining limits
-- Light/Dark dashboard; optional always-on-top, draggable floating widget
-- Global **Ctrl+Alt+C** show/hide shortcut (if available)
-- Auto-hide dashboard after 5 seconds when not in permanent floating mode
-- Configurable opacity (60–100%)
-- History views for 1h, 6h, 24h, 7d and 30d; CSV export
-- Optional start with Windows
-- Separate settings/history and installation from the original Codex Usage Tray
 
-## Requirements
-- Windows 11 x64
-- .NET 10 SDK and **Windows Desktop Runtime 10**
-- Authenticated `codex.cmd` CLI (ChatGPT sign-in)
-- Network access to download the upstream usage models on first build
+- One tray icon showing the lowest available percentage; hover to see both windows
+- Five-hour and seven-day rate-limit indicators
+- **Light** and **Dark** themes
+- Optional floating, movable dashboard
+- Configurable refresh intervals: 1, 2, 5, 10, 15 or 30 minutes
+- Configurable 20%, 10% and 5% remaining-allowance alerts
+- History charts for 1 hour, 6 hours, 24 hours, 7 days and 30 days; CSV export
+- Auto-hide after 5 seconds when not pinned as a floating widget
+- Global `Ctrl+Alt+C` shortcut (when not reserved by another app)
+- Start with Windows option
+- Separate configuration and history from the upstream project
 
-## Troubleshooting Codex CLI on Windows
+## Download and run (recommended)
 
-The monitor calls the npm-installed Codex CLI using `node.exe` and its `bin/codex.js` entry point, rather than wrapping `codex` through `cmd.exe` (which may prematurely close redirected standard input). The CLI must be installed in the current user's standard npm global directory.
+1. Open the [v1.3 GitHub Release](https://github.com/becooldanon/codex-usage-monitor-custom/releases/tag/v1.3).
+2. Download `CodexUsageMonitorCustom-v1.3-win-x64.zip` from **Assets**.
+3. Extract the full ZIP to a folder you control; **do not launch the EXE directly from the ZIP**.
+4. Run `CodexUsageMonitorCustom.exe` **from the same Windows user session where the Codex CLI is installed and signed in with ChatGPT**.
+5. Look for its icon in the Windows notification area. Right-click for the menu.
+
+This release is published as a Windows x64 standalone bundle: users do not need the .NET SDK to **run** the prebuilt ZIP. The authenticated Codex CLI is still required.
+
+### Codex CLI requirement
+
+In a PowerShell window running as your everyday Windows user:
 
 ```powershell
 codex.cmd --version
 codex.cmd login status
-Test-Path "$env:APPDATA\npm\node_modules\@openai\codex\bin\codex.js"
 ```
 
-If a refresh fails, the monitor retains its last successful values, which are **stale** until another successful refresh. Review `%LOCALAPPDATA%\CodexUsageMonitorCustom\diagnostics.log`.
-
-**Important:** Run the monitor in the same Windows user session where the Codex CLI is signed in. Running from a separate administrator account will use a different user profile and may not find the authenticated CLI.
-
-## Build and install
+If not installed, the Codex CLI can be installed with Node.js/npm:
 
 ```powershell
+npm install --global @openai/codex
+codex.cmd login
+```
+
+The app launches the npm-installed Codex CLI through `node.exe` and `bin/codex.js` to request usage from `codex app-server`. It does not store ChatGPT credentials.
+
+**Important:** If Codex is signed in under a regular account, launching this monitor under a different administrative account may show `N/A`. Run the monitor from the **same Windows account**, not through an elevated session belonging to another user.
+
+## Build from source
+
+Requires **Windows 11 x64**, .NET 10 SDK, .NET 10 Windows Desktop Runtime, Node.js/npm, the Codex CLI, and network access for first-build dependencies.
+
+```powershell
+git clone https://github.com/becooldanon/codex-usage-monitor-custom.git
+cd codex-usage-monitor-custom
 .\Build-And-Install.ps1
 ```
 
-To compile without installing:
+Build without installing:
 
 ```powershell
 .\Build-And-Install.ps1 -BuildOnly
 ```
 
-If Windows blocks unsigned PowerShell scripts, follow your organisation's security policy; do not bypass managed controls.
+Build a standalone bundle when the required NuGet runtime packs are available:
 
-The application installs into `%LOCALAPPDATA%\Programs\CodexUsageMonitorCustom` and saves user data in `%LOCALAPPDATA%\CodexUsageMonitorCustom`.
+```powershell
+.\Build-And-Install.ps1 -BuildOnly -Standalone
+```
 
-## About usage history
+The script installs (when not using `-BuildOnly`) into `%LOCALAPPDATA%\Programs\CodexUsageMonitorCustom` and starts the app. Close a running monitor from **Exit custom monitor** before upgrading. Follow your organisation's PowerShell execution policy.
 
-History is recorded when this application polls Codex; **earlier sessions cannot be backfilled** automatically. Usage charts show rate-limit *remaining percentages*, not exact token counts. The local Codex app-server interface is experimental and can change.
+### User data
 
-## Attribution and licensing
+History, settings and diagnostics are local to the Windows user at:
 
-Inspired by [Tooblippe/codex-usage](https://github.com/Tooblippe/codex-usage), licensed under MIT. The build script downloads `UsageModels.cs` and the upstream `LICENSE` (a patched `CodexRateLimitReader.cs` is maintained in this repository) from that project's `main` branch. Preserve upstream notices when distributing modified copies or binaries. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+`%LOCALAPPDATA%\CodexUsageMonitorCustom`
 
-MIT licensed for this project's original code. Not affiliated with or endorsed by OpenAI or the upstream author.
+History begins with the first successful polling result; previous usage cannot be automatically reconstructed. A failed refresh preserves the last successful values (which may be stale). For troubleshooting, check `diagnostics.log` and use the read-only `Test-CodexConnection.ps1` helper.
 
-## Validation status
+## Releases and validation
 
-The final v1.3 source cleanup has **not been independently compiled in this environment**. The monitor works on the user's Windows installation when launched from the authenticated Windows session. No prebuilt executable or GitHub Release has been published yet.
+- **v1.3 (2026-10-13):** first published Windows x64 binary, produced by the GitHub Actions release workflow, and verified by the maintainer on Windows 11. Includes Light/Dark themes, a single tray icon, auto-refresh, alerts and history.
+- Release builds are generated by [Build Windows Release](.github/workflows/windows-release.yml) when a `v*` tag is pushed.
+- [Changelog](CHANGELOG.md)
+
+## Acknowledgements and license
+
+This is an independent modification inspired by [Tooblippe/codex-usage](https://github.com/Tooblippe/codex-usage), licensed under MIT. The patched Codex reader is tracked in this repository; the build downloads upstream `UsageModels.cs` and the original upstream license. Preserve upstream notices when distributing the software. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) and [LICENSE](LICENSE).
+
+Not affiliated with, sponsored by or endorsed by OpenAI or the upstream project author.
