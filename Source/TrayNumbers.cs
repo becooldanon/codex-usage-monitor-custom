@@ -15,13 +15,14 @@ internal static class Palette
     internal static string Theme { get; private set; } = "Dark";
     internal static void SetTheme(string theme) => Theme = theme is "Light" or "Dark" or "Transparent" ? theme : "Dark";
     internal static bool IsLight => Theme == "Light";
-    internal static Color Background => IsLight ? Color.FromArgb(244, 247, 252) : Color.FromArgb(18, 24, 36);
-    internal static Color Panel => IsLight ? Color.White : Color.FromArgb(30, 40, 56);
-    internal static Color Foreground => IsLight ? Color.FromArgb(25, 34, 51) : Color.FromArgb(234, 239, 247);
-    internal static Color Secondary => IsLight ? Color.FromArgb(85, 100, 122) : Color.FromArgb(166, 179, 199);
-    internal static Color Track => IsLight ? Color.FromArgb(214, 222, 234) : Color.FromArgb(62, 76, 93);
-    internal static Color Guide => IsLight ? Color.FromArgb(217, 225, 236) : Color.FromArgb(58, 70, 87);
-    internal static Color Border => IsLight ? Color.FromArgb(195, 209, 224) : Color.FromArgb(69, 84, 105);
+    internal static bool IsTransparent => Theme == "Transparent";
+    internal static Color Background => IsTransparent ? Color.Magenta : IsLight ? Color.FromArgb(244, 247, 252) : Color.Black;
+    internal static Color Panel => IsTransparent ? Color.Magenta : IsLight ? Color.White : Color.FromArgb(18, 18, 18);
+    internal static Color Foreground => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(25, 34, 51) : Color.FromArgb(245, 245, 245);
+    internal static Color Secondary => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(85, 100, 122) : Color.FromArgb(190, 190, 190);
+    internal static Color Track => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(214, 222, 234) : Color.FromArgb(62, 62, 62);
+    internal static Color Guide => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(217, 225, 236) : Color.FromArgb(52, 52, 52);
+    internal static Color Border => IsTransparent ? Color.Black : IsLight ? Color.FromArgb(195, 209, 224) : Color.FromArgb(65, 65, 65);
 }
 
 internal static class TrayNumbers
@@ -36,7 +37,7 @@ internal static class TrayNumbers
         using Graphics graphics = Graphics.FromImage(bitmap);
         graphics.Clear(Color.Transparent);
         graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-        using var background = new SolidBrush(Palette.Background);
+        using var background = new SolidBrush(Palette.IsTransparent ? Color.Black : Palette.Background);
         graphics.FillRoundedRectangle(background, new Rectangle(0, 0, 31, 31), 6);
         string number = percentage is int value ? value.ToString() : "--";
         using Font font = new("Segoe UI", number.Length == 3 ? 13f : 17f, FontStyle.Bold, GraphicsUnit.Pixel);
