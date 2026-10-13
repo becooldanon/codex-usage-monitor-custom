@@ -60,6 +60,7 @@ internal sealed class Dashboard : Form
             header.MouseUp += (_, _) => { if (_dragging) { _dragging = false; PositionChanged?.Invoke(); } };
         }
     }
+    internal void ShowRefreshError(string message) => _details.Text = "Refresh failed (last known values): " + Truncate(message, 26);
     internal void Update(UsageSnapshot snapshot, IReadOnlyList<HistorySample> history, bool refreshing)
     {
         _five.Update(snapshot.FiveHour);
