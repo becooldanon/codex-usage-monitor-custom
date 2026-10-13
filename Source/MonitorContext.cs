@@ -46,7 +46,7 @@ internal sealed class MonitorContext : ApplicationContext
         autoHide.CheckedChanged += (_, _) => { _settings.AutoHide = autoHide.Checked; Save(); };
         menu.Items.Add(autoHide);
         var themeMenu = new ToolStripMenuItem("Theme");
-        foreach (string theme in new[] { "Light", "Dark", "Transparent" })
+        foreach (string theme in new[] { "Light", "Dark" })
         {
             string selectedTheme = theme;
             var item = new ToolStripMenuItem(theme) { Checked = Palette.Theme == theme };
@@ -129,11 +129,8 @@ internal sealed class MonitorContext : ApplicationContext
         if (_settings.FloatingVisible) ShowDashboard();
         _ = RefreshAsync();
     }
-    // In transparent mode, color-key transparency removes the background only.
-    // Keep labels and graph lines fully opaque, and restore the normal opacity when switching themes.
     private void ApplyWindowOpacity() => _dashboard.Opacity =
-        Palette.Theme == "Transparent" ? 1d
-        : Math.Clamp(_settings.OpacityPercent, 40, 100) / 100d;
+        Math.Clamp(_settings.OpacityPercent, 40, 100) / 100d;
 
     private void ShowDashboard()
     {
