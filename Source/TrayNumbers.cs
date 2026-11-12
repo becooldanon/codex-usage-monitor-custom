@@ -30,24 +30,44 @@ internal static class TrayNumbers
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool DestroyIcon(IntPtr handle);
 
-    internal static Icon Render(string title, int? percentage)
+    // The single notification icon contains two independent remaining percentages:
+    // top = 5-hour allowance (green), bottom = weekly allowance (blue).
+    internal static Icon Render(int? fiveHour, int? weekly)
     {
         using Bitmap bitmap = new(32, 32);
         using Graphics graphics = Graphics.FromImage(bitmap);
         graphics.Clear(Color.Transparent);
         graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-        using var background = new SolidBrush(Palette.Background);
-        graphics.FillRoundedRectangle(background, new Rectangle(0, 0, 31, 31), 6);
-        string number = percentage is int value ? value.ToString() : "--";
-        using Font font = new("Segoe UI", number.Length == 3 ? 13f : 17f, FontStyle.Bold, GraphicsUnit.Pixel);
-        TextRenderer.DrawText(graphics, number, font, new Rectangle(0, 2, 32, 24), Palette.For(percentage),
-            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
-        using Font tagFont = new("Segoe UI", 7f, FontStyle.Bold, GraphicsUnit.Pixel);
-        TextRenderer.DrawText(graphics, title, tagFont, new Rectangle(0, 23, 32, 8), Palette.Secondary,
-            TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPadding);
+        graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+
+        using var background = new SolidBrush(Color.FromArgb(15, 20, 28));
+        graphics.FillRoundedRectangle(background, new Rectangle(0, 0, 31, 31), 5);
+
+        using var separator = new Pen(Color.FromArgb(85, 98, 112), 1);
+        graphics.DrawLine(separator, 3, 16, 28, 16);
+
+        DrawReading(graphics, fiveHour, 0, Color.FromArgb(66, 225, 131));
+        DrawReading(graphics, weekly, 17, Color.FromArgb(71, 167, 255));
+
         IntPtr handle = bitmap.GetHicon();
-        try { using Icon temp = Icon.FromHandle(handle); return (Icon)temp.Clone(); }
+        try
+        {
+            using Icon temporary = Icon.FromHandle(handle);
+            return (Icon)temporary.Clone();
+        }
         finally { DestroyIcon(handle); }
+    }
+
+    private static void DrawReading(Graphics graphics, int? percent, int top, Color color)
+    {
+        string value = percent is int n ? Math.Clamp(n, 0, 100).ToString() : "--";
+        // Fit 100 and smaller values without clipping the 32px tray canvas.
+        float size = value.Length == 3 ? 13f : 16f;
+        using Font font = new("Segoe UI", size, FontStyle.Bold, GraphicsUnit.Pixel);
+        TextRenderer.DrawText(
+            graphics, value, font, new Rectangle(1, top, 30, 15), percent.HasValue ? color : Color.Gray,
+            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter |
+            TextFormatFlags.NoPadding | TextFormatFlags.SingleLine);
     }
 }
 
