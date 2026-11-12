@@ -196,8 +196,7 @@ internal sealed class MonitorContext : ApplicationContext
     {
         int? five = _snapshot.FiveHour.State == LimitState.Available ? _snapshot.FiveHour.RemainingPercent : null;
         int? week = _snapshot.Weekly.State == LimitState.Available ? _snapshot.Weekly.RemainingPercent : null;
-        int? remaining = new int?[] { five, week }.Min();
-        Icon next = TrayNumbers.Render("", remaining);
+        Icon next = TrayNumbers.Render(five, week);
         Icon? old = _rendered;
         _rendered = next;
         _trayIcon.Icon = next;
