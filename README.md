@@ -13,7 +13,7 @@ A lightweight Windows 11 system tray application for tracking **OpenAI Codex rat
 
 ## Features
 
-- One tray icon showing the lowest available percentage; hover to see both windows
+- One tray icon showing **both** remaining percentages simultaneously: **5-hour in green (top)** and **weekly in blue (bottom)**; hover for labeled values
 - Five-hour and seven-day rate-limit indicators
 - **Light** and **Dark** themes
 - Optional floating, movable dashboard
