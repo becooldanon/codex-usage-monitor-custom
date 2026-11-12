@@ -1,10 +1,14 @@
 # Changelog
 
-## Unreleased — next version
+## v1.4 — 2026-11-12
 
-- Show both remaining rate-limit percentages in a single notification-area icon: green for 5-hour allowance (top), blue for weekly allowance (bottom).
-- Keep the v1.3 release artifact unchanged until this update has been compiled and verified on Windows.
+### Changed
+- Display both remaining rate-limit percentages within one notification-area icon: **5-hour green (top)** and **weekly blue (bottom)**.
+- Keep the dashboard, reader, alerts, settings and history behavior unchanged.
 
+### Validation
+- The two-value icon and live usage readings were confirmed working in the authenticated Windows user session.
+- The previous v1.3 release remains available as a rollback option.
 
 ## v1.3 — 2026-10-13
 
